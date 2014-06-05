@@ -9,14 +9,14 @@
 class MultiSafepayRedirectGateway extends eZRedirectGateway {
 
     const AUTOMATIC_STATUS   = false;
-    const TYPE_MULTI_SAFEPAY = 'multifafepay';
+    const TYPE_MULTI_SAFEPAY = 'multisafepay';
 
     public function __construct() {
         $this->logger = self::getLogHandler();
     }
 
     public static function getLogHandler() {
-        return eZPaymentLogger::CreateForAdd( 'var/log/multifafepay.log' );
+        return eZPaymentLogger::CreateForAdd( 'var/log/multisafepay.log' );
     }
 
     public function createPaymentObject( $processID, $orderID ) {
