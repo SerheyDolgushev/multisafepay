@@ -644,6 +644,10 @@ class MultiSafepayTransaction extends eZPersistentObject {
             throw new Exception( $api->error, $api->error_code );
         }
 
+        if( strlen( $this->attribute( 't_gateway' ) ) === 0 ) {
+            $this->setAttribute( 't_gateway', $api->details['paymentdetails']['type'] );
+        }
+
         $this->setAttribute( 'status', $status );
         $this->setAttribute( 'c_amount', $api->details['customer']['amount'] );
         $this->setAttribute( 'c_currency', $api->details['customer']['currency'] );
