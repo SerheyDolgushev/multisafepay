@@ -38,11 +38,15 @@ foreach( $transactions as $k => $transaction ) {
     $cli->output( $message );
 
     $transaction->updateStatus();
-    $cli->output( 'Transaction #' . $transaction->attribute(  't_id' ) . ': ' . $transaction->attribute( 'status' ) );
-    
+    $cli->output( 'Transaction #' . $transaction->attribute( 't_id' ) . ': ' . $transaction->attribute( 'status' ) );
+
     if( $transaction->attribute( 'status' ) == 'completed' ) {
         $order = $transaction->attribute( 'order' );
         if( $order instanceof eZOrder === false ) {
+            continue;
+        }
+
+        if( (bool) $order->attribute( 'is_temporary' ) === true ) {
             continue;
         }
 
