@@ -37,7 +37,13 @@ foreach( $transactions as $k => $transaction ) {
         . '% (' . $k . '/' . $count . '), Memory usage: ' . $memoryUsage . ' Mb';
     $cli->output( $message );
 
-    $transaction->updateStatus();
+    try {
+        $transaction->updateStatus();
+    } catch( Exception $e ) {
+        $cli->output( 'Transaction #' . $transaction->attribute( 't_id' ) . ', ERROR' . $e->getMessage() );
+        continue;
+    }
+    
     $cli->output( 'Transaction #' . $transaction->attribute( 't_id' ) . ': ' . $transaction->attribute( 'status' ) );
 
     if( $transaction->attribute( 'status' ) == 'completed' ) {
