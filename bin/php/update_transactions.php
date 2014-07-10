@@ -46,7 +46,7 @@ foreach( $transactions as $k => $transaction ) {
             continue;
         }
 
-        if( (bool) $order->attribute( 'is_temporary' ) === true ) {
+        if( (bool) $order->attribute( 'is_temporary' ) === false ) {
             continue;
         }
 
