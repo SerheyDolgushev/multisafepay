@@ -30,7 +30,6 @@ $cli->output( 'Fetching MSP transactions' );
 
 $transactions = MultiSafepayTransaction::fetchList( array( 'status' => 'initialized' ) );
 $count        = count( $transactions );
-$defaultHost  = eZINI::instance()->variable( 'SiteSettings', 'SiteURL' );
 foreach( $transactions as $k => $transaction ) {
     $memoryUsage = number_format( memory_get_usage( true ) / ( 1024 * 1024 ), 2 );
     $message     = '[' . date( 'c' ) . '] ' . number_format( $k / $count * 100, 2 )
@@ -43,7 +42,7 @@ foreach( $transactions as $k => $transaction ) {
         $cli->output( 'Transaction #' . $transaction->attribute( 't_id' ) . ', ERROR' . $e->getMessage() );
         continue;
     }
-    
+
     $cli->output( 'Transaction #' . $transaction->attribute( 't_id' ) . ': ' . $transaction->attribute( 'status' ) );
 
     if( $transaction->attribute( 'status' ) == 'completed' ) {
@@ -55,23 +54,6 @@ foreach( $transactions as $k => $transaction ) {
         if( (bool) $order->attribute( 'is_temporary' ) === false ) {
             continue;
         }
-
-        // Get orders siteaccess
-        $sa    = null;
-        $items = eZOrderItem::fetchListByType( $order->attribute( 'id' ), 'siteaccess' );
-        if( count( $items ) > 0 ) {
-            $sa = $items[0]->attribute( 'description' );
-        }
-        // Set host of the order`s siteaccess
-        if( $sa === null ) {
-            $host = $defaultHost;
-        } else {
-            $host = eZINI::getSiteAccessIni( $sa, 'site.ini' )->variable( 'SiteSettings', 'SiteURL' );
-        }
-        eZINI::instance()->setVariable( 'SiteSettings', 'SiteURL', $host );
-        // Set SA path
-        $tmp                         = explode( '/', $host );
-        eZSys::instance()->IndexFile = '/' . end( $tmp );
 
         $transaction->updatePaymentObject();
     }

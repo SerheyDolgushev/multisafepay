@@ -671,6 +671,8 @@ class MultiSafepayTransaction extends eZPersistentObject {
             return false;
         }
 
+        $this->setOrdersSA( $order );
+
         $paymentObject     = eZPaymentObject::fetchByOrderID( $order->attribute( 'id' ) );
         $xrowPaymentObject = xrowPaymentObject::fetchByOrderID( $order->attribute( 'id' ) );
         if( $xrowPaymentObject instanceof xrowPaymentObject === false ) {
@@ -703,6 +705,29 @@ class MultiSafepayTransaction extends eZPersistentObject {
             $paymentObject->store();
             eZPaymentObject::continueWorkflow( $paymentObject->attribute( 'workflowprocess_id' ) );
         }
+    }
+
+    protected function setOrdersSA( eZOrder $order ) {
+        $defaultHost = eZINI::instance()->variable( 'SiteSettings', 'SiteURL' );
+
+        // Get orders siteaccess
+        $sa    = null;
+        $items = eZOrderItem::fetchListByType( $order->attribute( 'id' ), 'siteaccess' );
+        if( count( $items ) > 0 ) {
+            $sa = $items[0]->attribute( 'description' );
+        }
+
+        // Set host of the order`s siteaccess
+        if( $sa === null ) {
+            $host = $defaultHost;
+        } else {
+            $host = eZINI::getSiteAccessIni( $sa, 'site.ini' )->variable( 'SiteSettings', 'SiteURL' );
+        }
+        eZINI::instance()->setVariable( 'SiteSettings', 'SiteURL', $host );
+
+        // Set SA path
+        $tmp                         = explode( '/', $host );
+        eZSys::instance()->IndexFile = '/' . end( $tmp );
     }
 
 }
